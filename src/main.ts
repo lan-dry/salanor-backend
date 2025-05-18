@@ -7,8 +7,6 @@ import * as cors from 'cors';
 import serverlessExpress from '@vendia/serverless-express';
 import { Handler } from 'aws-lambda';
 
-let server: Handler;
-
 async function bootstrap(): Promise<Handler> {
   const expressApp = express();
 
@@ -29,12 +27,11 @@ async function bootstrap(): Promise<Handler> {
   return serverlessExpress({ app: expressApp });
 }
 
+// Directly export the handler as the default export
 export const handler: Handler = async (event, context, callback) => {
-  server = server ?? (await bootstrap());
-  
-  // Ensure server is called with event, context, and callback
+  const server = await bootstrap();
   return server(event, context, callback);
 };
 
-// Make sure this is the default export
-export default handler;  // This is essential for serverless-express
+// Ensure this is the default export
+export default handler;  // Important for AWS Lambda's serverless-express
