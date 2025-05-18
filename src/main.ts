@@ -1,4 +1,3 @@
-// src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
@@ -26,13 +25,16 @@ async function bootstrap(): Promise<Handler> {
   app.setGlobalPrefix('api');
   await app.init();
 
-  // Wrap the Express app with serverless-express
+  // Return serverless-express handler
   return serverlessExpress({ app: expressApp });
 }
 
 export const handler: Handler = async (event, context, callback) => {
   server = server ?? (await bootstrap());
   
-  // Now, pass all three arguments: event, context, and callback
+  // Ensure server is called with event, context, and callback
   return server(event, context, callback);
 };
+
+// Make sure this is the default export
+export default handler;  // This is essential for serverless-express
