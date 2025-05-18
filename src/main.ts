@@ -1,21 +1,39 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import * as express from 'express';
+import * as cors from 'cors';
+import serverlessExpress from '@vendia/serverless-express';
+import { Handler } from 'aws-lambda';
 
-const cors = require('cors');
-const corsOptions ={
-    origin:'*', 
-    credentials:true,
-    optionSuccessStatus:200
-}
+let server: Handler;
 
-async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
-	
+async function bootstrap(): Promise<Handler> {
+	const expressApp = express();
+
+	const corsOptions = {
+		origin: '*',
+		credentials: true,
+		optionsSuccessStatus: 200,
+	};
+	expressApp.use(cors(corsOptions));
+
+	const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp));
+
 	app.useGlobalInterceptors(new ResponseInterceptor());
 	app.setGlobalPrefix('api');
-	app.use(cors(corsOptions));
-	
-	await app.listen(process.env.PORT ?? 3000);
+	await app.init();
+
+	// Return serverless-express handler
+	return serverlessExpress({ app: expressApp });
 }
-bootstrap();
+
+// Correctly export the handler
+export const handler: Handler = async (event, context, callback) => {
+	if (!server) {
+		server = await bootstrap();
+	}
+	// Return the result of serverless-express, which will handle the callback internally.
+	return server(event, context, callback); 
+};
