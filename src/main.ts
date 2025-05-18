@@ -4,7 +4,8 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import * as express from 'express';
 import * as cors from 'cors';
-import serverlessExpress from '@vendia/serverless-express';
+// import serverlessExpress from '@vendia/serverless-express';
+import { default as serverlessExpress } from '@vendia/serverless-express';
 import { Handler } from 'aws-lambda';
 
 // Declare server as a handler
