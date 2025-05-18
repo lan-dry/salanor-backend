@@ -5,6 +5,7 @@ import { WaitlistModule } from './modules/waitlist/waitlist.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PreOrderModule } from './modules/pre-order/pre-order.module';
+import { ContactModule } from './modules/contact/contact.module';
 
 @Module({
 	imports: [
@@ -21,7 +22,8 @@ import { PreOrderModule } from './modules/pre-order/pre-order.module';
 			inject: [ConfigService],
 		}),
 		WaitlistModule,
-		PreOrderModule
+		PreOrderModule,
+		ContactModule
 	],
 	controllers: [AppController],
 	providers: [AppService],
